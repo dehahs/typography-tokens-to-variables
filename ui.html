@@ -1,0 +1,63 @@
+<html>
+<body>
+  <h2>Typography Tokens to Variables</h2>
+  <label for="file-input" class="file-label">Choose JSON file</label>
+  <input type="file" id="file-input" accept=".json">
+  <div id="file-name"></div>
+
+  <style>
+    body {
+      padding: 20px;
+      font-family: Inter, sans-serif;
+    }
+    
+    .file-label {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #18A0FB;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    #file-name {
+      margin-top: 10px;
+      color: #666;
+    }
+  </style>
+
+  <script>
+    document.getElementById('file-input').onchange = async (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        document.getElementById('file-name').textContent = `Selected: ${file.name}`;
+      }
+      
+      const reader = new FileReader();
+      
+      reader.onload = async (e) => {
+        const text = e.target.result;
+        
+        try {
+          JSON.parse(text); // Test parse
+          parent.postMessage({ 
+            pluginMessage: { 
+              type: 'import-tokens',
+              tokens: text
+            }
+          }, '*');
+        } catch (err) {
+          console.error('Invalid JSON file:', err);
+          alert('Invalid JSON file. Please check the file format.');
+        }
+      };
+      
+      reader.readAsText(file);
+    };
+  </script>
+</body>
+</html> 
